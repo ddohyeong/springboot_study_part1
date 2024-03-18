@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import restfultest.demo.bean.User;
 import restfultest.demo.dao.UserDaoService;
+import restfultest.demo.exception.UserNotFoundException;
 
 @RestController
 @AllArgsConstructor
@@ -32,8 +33,15 @@ public class UserController {
 
 	@GetMapping(path = "/users/{id}")
 	public User retrieveUser(@PathVariable int id) {
-		System.out.println("id = " + id);
-		return userDaoService.findOne(id);
+		// return userDaoService.findOne(id);
+
+		User user = userDaoService.findOne(id);
+
+		if (user == null) {
+			throw new UserNotFoundException(String.format("Id[%s] not found", id));
+		}
+
+		return user;
 	}
 
 	// @PostMapping(path = "/users")
