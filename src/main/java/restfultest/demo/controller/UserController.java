@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import restfultest.demo.bean.User;
@@ -51,7 +53,7 @@ public class UserController {
 	// }
 
 	@PostMapping("/users")
-	public ResponseEntity<User> createUser1(@RequestBody User user) {
+	public ResponseEntity<User> createUser1(@RequestBody @Valid User user) {
 		User savedUser = userDaoService.save(user);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -60,5 +62,15 @@ public class UserController {
 				.toUri();
 		System.out.println("location = " + location);
 		return ResponseEntity.created(location).build();
+	}
+
+	@DeleteMapping("/users/{id}")
+	public ResponseEntity deleteUser(@PathVariable int id) {
+		User user = userDaoService.deleteById(id);
+
+		if (user == null) {
+			throw new UserNotFoundException(String.format("Id[%s] not found", id));
+		}
+		return ResponseEntity.noContent().build();
 	}
 }
